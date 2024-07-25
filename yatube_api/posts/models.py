@@ -48,7 +48,7 @@ class Comment(models.Model):
 
 class Follow(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='users'
+        User, on_delete=models.CASCADE, related_name='followers'
     )
     following = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='follows'
@@ -59,6 +59,10 @@ class Follow(models.Model):
             models.UniqueConstraint(
                 fields=['user', 'following'],
                 name='unique_user_following'
+            ),
+            models.CheckConstraint(
+                check=~models.Q(user=models.F('following')),
+                name='%(app_label)s_%(class)s_prevent_self_follow',
             )
         ]
 
